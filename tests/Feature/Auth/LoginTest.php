@@ -31,7 +31,7 @@ test('login fails with incorrect credentials', function () {
 
     postJson($this->url, $request)
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['email', __('auth.failed')]);
+        ->assertJsonValidationErrors(['email' => __('auth.failed')]);
 });
 
 test('email should be valid', function () {
@@ -46,19 +46,19 @@ test('email should be valid', function () {
 test('email should be required', function () {
     postJson($this->url, [])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['email', __('validation.required')]);
+        ->assertJsonValidationErrors(['email' => __('validation.required', ['attribute' => 'e-mail'])]);
 });
 
 test('email should be a string', function () {
     postJson($this->url, ['email' => 12345])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['email', __('validation.string')]);
+        ->assertJsonValidationErrors(['email' => __('validation.string', ['attribute' => 'e-mail'])]);
 });
 
 test('email should be a valid email address', function (string $email) {
-    postJson($this->url, [compact('email')])
+    postJson($this->url, ['email' => $email])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['email', __('validation.email')]);
+        ->assertJsonValidationErrors(['email' => __('validation.email', ['attribute' => 'e-mail'])]);
 })->with(['invalid-email', 'invalid-email@.com']);
 
 test('password should be valid', function () {
@@ -69,13 +69,13 @@ test('password should be valid', function () {
 test('password should be required', function () {
     postJson($this->url, [])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['password', __('validation.required')]);
+        ->assertJsonValidationErrors(['password' => __('validation.required', ['attribute' => 'senha'])]);
 });
 
 test('password should be a string', function () {
     postJson($this->url, ['password' => 12345])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['password', __('validation.string')]);
+        ->assertJsonValidationErrors(['password' => __('validation.string', ['attribute' => 'senha'])]);
 });
 
 test('remember should be valid', function () {
@@ -86,11 +86,11 @@ test('remember should be valid', function () {
 test('remember should be required', function () {
     postJson($this->url, [])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['remember', __('validation.required')]);
+        ->assertJsonValidationErrors(['remember' => __('validation.required', ['attribute' => 'lembrar-me'])]);
 });
 
 test('remember should be a boolean', function () {
     postJson($this->url, ['remember' => 'not_a_boolean'])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['remember', __('validation.boolean')]);
+        ->assertJsonValidationErrors(['remember' => __('validation.boolean', ['attribute' => 'lembrar-me'])]);
 });
