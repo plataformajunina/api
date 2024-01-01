@@ -2,7 +2,7 @@
 
 use App\Models\User;
 
-use function Pest\Laravel\postJson;
+use function Pest\Laravel\{assertDatabaseCount, postJson};
 
 beforeEach(fn() => $this->url = '/api/login');
 
@@ -18,6 +18,8 @@ test('user can login', function () {
     postJson($this->url, $request)
         ->assertOk()
         ->assertJsonStructure(['access_token', 'token_type']);
+
+    assertDatabaseCount('personal_access_tokens', 1);
 });
 
 test('login fails with incorrect credentials', function () {
@@ -32,6 +34,8 @@ test('login fails with incorrect credentials', function () {
     postJson($this->url, $request)
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['email' => __('auth.failed')]);
+
+    assertDatabaseCount('personal_access_tokens', 0);
 });
 
 test('email should be valid', function () {
