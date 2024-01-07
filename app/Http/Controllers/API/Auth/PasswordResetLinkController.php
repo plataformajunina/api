@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\API\Auth;
 
 use App\Actions\Auth\PasswordResetLink;
 use App\Http\Controllers\Controller;
