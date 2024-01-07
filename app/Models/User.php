@@ -3,8 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Enums\{Permission, Role};
-use App\Services\AclService;
+use App\Services\ACL\{GroupACLService, PersonACLService, SupportACLService, TenantACLService};
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Enums\{Permission, Role, SupportRole};
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -34,17 +35,10 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    protected function isMainSupport(): Attribute
+    protected function isSupport(): Attribute
     {
         return Attribute::make(
-            get: fn(): bool => $this->role === Role::MAIN_SUPPORT,
-        );
-    }
-
-    protected function isManagerSupport(): Attribute
-    {
-        return Attribute::make(
-            get: fn(): bool => $this->role === Role::MANAGER_SUPPORT,
+            get: fn(): bool => $this->role === Role::SUPPORT,
         );
     }
 
@@ -71,9 +65,19 @@ class User extends Authenticatable
 
     public function hasPermissionTo(Permission $permission): bool
     {
-        return AclService::hasPermissionTo(
-            role: $this->role,
-            permission: $permission
-        );
+        return match ($this->role) {
+            Role::SUPPORT => (function () use ($permission): bool {
+                $service = new SupportACLService($this->support->role);
+                return $service->hasPermissionTo($permission);
+            })(),
+            Role::TENANT => app(TenantACLService::class)->hasPermissionTo($permission),
+            Role::GROUP => app(GroupACLService::class)->hasPermissionTo($permission),
+            default => app(PersonACLService::class)->hasPermissionTo($permission),
+        };
+    }
+
+    public function support(): HasOne
+    {
+        return $this->hasOne(Support::class);
     }
 }
