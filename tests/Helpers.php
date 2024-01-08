@@ -16,3 +16,24 @@ function actingAsManegerSupport(): TestCase
 
     return test()->actingAs($support->user);
 }
+
+function actingAsTenant(): TestCase
+{
+    $user = User::factory()->asTenant()->create();
+
+    return test()->actingAs($user);
+}
+
+function actingAsGroup(): TestCase
+{
+    $user = User::factory()->asGroup()->create();
+
+    return test()->actingAs($user);
+}
+
+function actingAsPerson(): TestCase
+{
+    $user = User::factory()->create();
+
+    return test()->actingAs($user);
+}
