@@ -31,9 +31,14 @@ class SupportController extends Controller
         );
     }
 
-    public function show(Support $support)
+    public function show(Support $support): Response
     {
-        //
+        $this->authorize('view', $support);
+
+        return response(
+            content: new SupportResource($support),
+            status: Response::HTTP_OK
+        );
     }
 
     public function update(Request $request, Support $support)
